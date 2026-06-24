@@ -1,0 +1,117 @@
+/* css/variables.css — Deezer-Manager Premium Theme System */
+:root {
+  --font-main: 'Outfit', system-ui, -apple-system, sans-serif;
+
+  /* ─── Brand Colors ─── */
+  --accent-purple: hsl(270, 100%, 60%);
+  --accent-purple-hover: hsl(270, 100%, 50%);
+  --accent-purple-glow: hsla(270, 100%, 60%, 0.35);
+  --accent-purple-soft: hsla(270, 100%, 60%, 0.12);
+  --accent-cyan: hsl(170, 100%, 50%);
+  --accent-cyan-dim: hsl(170, 60%, 40%);
+  --accent-cyan-glow: hsla(170, 100%, 50%, 0.25);
+  --accent-gradient: linear-gradient(135deg, hsl(270, 100%, 60%), hsl(300, 80%, 55%));
+  --accent-gradient-subtle: linear-gradient(135deg, hsla(270, 100%, 60%, 0.15), hsla(300, 80%, 55%, 0.08));
+  --neon-gradient: linear-gradient(135deg, hsl(270, 60%, 20%), hsl(300, 40%, 15%), hsl(200, 60%, 10%));
+
+  /* ─── Dark Palette (Default) ─── */
+  --bg-body: hsl(240, 15%, 8%);
+  --bg-sidebar: hsl(240, 14%, 10%);
+  --bg-surface: hsl(240, 12%, 12%);
+  --bg-card: hsl(240, 12%, 14%);
+  --bg-input: hsl(240, 12%, 16%);
+  --bg-hover: hsl(240, 12%, 18%);
+  --bg-elevated: hsl(240, 12%, 20%);
+
+  --border-color: hsl(240, 10%, 20%);
+  --border-subtle: hsl(240, 10%, 16%);
+  --border-glow: hsla(270, 100%, 60%, 0.4);
+
+  --text-primary: hsl(0, 0%, 95%);
+  --text-secondary: hsl(0, 0%, 65%);
+  --text-tertiary: hsl(0, 0%, 45%);
+  --text-light: hsl(0, 0%, 100%);
+
+  /* ─── Glassmorphism ─── */
+  --glass-bg: hsla(240, 12%, 14%, 0.7);
+  --glass-border: hsla(0, 0%, 100%, 0.06);
+  --glass-blur: blur(16px);
+
+  /* ─── Shadows ─── */
+  --shadow-sm: 0 2px 8px hsla(0, 0%, 0%, 0.3);
+  --shadow-md: 0 8px 24px hsla(0, 0%, 0%, 0.5);
+  --shadow-lg: 0 16px 48px hsla(0, 0%, 0%, 0.6);
+  --shadow-glow-purple: 0 0 30px hsla(270, 100%, 60%, 0.2);
+  --shadow-glow-cyan: 0 0 20px hsla(170, 100%, 50%, 0.15);
+
+  /* ─── Radii ─── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ─── Transitions ─── */
+  --t-fast: 0.15s ease;
+  --t-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --t-slow: 0.4s ease;
+  --t-bounce: 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* ─── Layout Sizing ─── */
+  --sidebar-width: 200px;
+  --topbar-height: 56px;
+  --player-height: 80px;
+
+  /* ─── State Colors ─── */
+  --color-success: hsl(145, 80%, 42%);
+  --color-success-bg: hsla(145, 80%, 42%, 0.12);
+  --color-warning: hsl(42, 100%, 50%);
+  --color-warning-bg: hsla(42, 100%, 50%, 0.12);
+  --color-danger: hsl(355, 85%, 55%);
+  --color-danger-bg: hsla(355, 85%, 55%, 0.12);
+  --color-info: hsl(210, 100%, 55%);
+  --color-info-bg: hsla(210, 100%, 55%, 0.12);
+
+  /* ─── Stars ─── */
+  --star-color: hsl(45, 100%, 50%);
+  --star-empty: hsl(240, 10%, 28%);
+
+  /* ─── Scrollbar ─── */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: hsl(240, 10%, 22%);
+  --scrollbar-thumb-hover: hsl(240, 10%, 30%);
+}
+
+/* ─── Light Mode Overrides ─── */
+[data-theme="light"] {
+  --bg-body: hsl(220, 20%, 96%);
+  --bg-sidebar: hsl(220, 18%, 94%);
+  --bg-surface: hsl(0, 0%, 100%);
+  --bg-card: hsl(0, 0%, 100%);
+  --bg-input: hsl(220, 15%, 95%);
+  --bg-hover: hsl(220, 15%, 92%);
+  --bg-elevated: hsl(220, 15%, 88%);
+
+  --border-color: hsl(220, 12%, 85%);
+  --border-subtle: hsl(220, 12%, 90%);
+  --border-glow: hsla(270, 100%, 60%, 0.25);
+
+  --text-primary: hsl(220, 20%, 12%);
+  --text-secondary: hsl(220, 10%, 42%);
+  --text-tertiary: hsl(220, 8%, 62%);
+
+  --glass-bg: hsla(0, 0%, 100%, 0.7);
+  --glass-border: hsla(0, 0%, 0%, 0.06);
+
+  --shadow-sm: 0 2px 6px hsla(220, 20%, 10%, 0.06);
+  --shadow-md: 0 8px 20px hsla(220, 20%, 10%, 0.1);
+  --shadow-lg: 0 16px 40px hsla(220, 20%, 10%, 0.14);
+  --shadow-glow-purple: 0 0 20px hsla(270, 100%, 60%, 0.1);
+  --shadow-glow-cyan: 0 0 15px hsla(170, 100%, 50%, 0.08);
+
+  --star-empty: hsl(220, 10%, 80%);
+
+  --scrollbar-thumb: hsl(220, 10%, 80%);
+  --scrollbar-thumb-hover: hsl(220, 10%, 70%);
+}
