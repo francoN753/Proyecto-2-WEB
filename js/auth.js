@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Theme Management
     const initTheme = () => {
-        const savedTheme = localStorage.getItem('deezer_theme') || 'dark';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
     };
@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('deezer_theme', newTheme);
+        localStorage.setItem('theme', newTheme);
         updateThemeIcon(newTheme);
     });
 
     // Check if already authenticated
-    if (localStorage.getItem('deezer_auth_token')) {
-        window.location.href = 'app.html';
+    if (localStorage.getItem('authToken')) {
+        window.location.href = 'dashboard.html';
         return;
     }
 
@@ -53,9 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
             await simulateAuthAPI(username, password);
             
             // 4. On success, store token and redirect
-            localStorage.setItem('deezer_auth_token', 'token_simulado_' + Date.now());
-            localStorage.setItem('deezer_user', username);
-            window.location.href = 'app.html';
+            localStorage.setItem('authToken', 'token_simulado_' + Date.now());
+            localStorage.setItem('loggedUser', username);
+            window.location.href = 'dashboard.html';
             
         } catch (error) {
             // Remove loading state on error
