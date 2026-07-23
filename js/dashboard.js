@@ -194,36 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /* ====================================================
-       6. FETCH CLIENT (Bypass CORS for Deezer API)
+       6. CLIENTE DE API
+       Las peticiones a Deezer se hacen con JSONP desde el módulo
+       DeezerAPI (js/api.js), que evita el bloqueo CORS sin usar
+       proxies de terceros ni un servidor propio.
        ==================================================== */
-    async function fetchJSONP(url) {
-        if (!navigator.onLine) {
-            throw new Error('OFFLINE');
-        }
-
-        try {
-            // Using a CORS proxy instead of JSONP for reliability and SW compatibility
-            const CORS_PROXY = 'https://corsproxy.io/?';
-            const finalUrl = CORS_PROXY + encodeURIComponent(url);
-            
-            const response = await fetch(finalUrl);
-            
-            if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.error) {
-                throw new Error(data.error.message || "Error devuelto por Deezer");
-            }
-            
-            return data;
-        } catch (error) {
-            console.error("Error consultando la API:", error);
-            throw new Error('Error de red al consultar el servidor de Deezer');
-        }
-    }
 
 
     /* ====================================================
@@ -264,8 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const searchUrl = `https://api.deezer.com/search/artist?q=${encodeURIComponent(query)}`;
-                const data = await fetchJSONP(searchUrl);
+                const data = await DeezerAPI.searchArtists(query);
 
                 searchSpinner.classList.remove('active');
 
@@ -320,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Deezer chart endpoint returns the most popular artists globally
-            const data = await fetchJSONP('https://api.deezer.com/chart/0/artists?limit=12');
+            const data = await DeezerAPI.getTrendingArtists(12);
 
             if (data.data && data.data.length > 0) {
                 trendingGrid.innerHTML = '';
@@ -389,10 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Load albums
         albumsGrid.innerHTML = '';
-        const albumsUrl = `https://api.deezer.com/artist/${artist.id}/albums`;
 
         try {
-            const data = await fetchJSONP(albumsUrl);
+            const data = await DeezerAPI.getArtistAlbums(artist.id);
             if (data.data && data.data.length > 0) {
                 const sortedAlbums = data.data.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
                 sortedAlbums.forEach(album => {
@@ -707,7 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cachedTracksKey = `deezer_tracks_${album.id}`;
 
             if (navigator.onLine) {
-                const data = await fetchJSONP(`https://api.deezer.com/album/${album.id}/tracks`);
+                const data = await DeezerAPI.getAlbumTracks(album.id);
                 if (data.data && data.data.length > 0) {
                     tracks = data.data;
                     // Cache tracks in localStorage for offline accessibility
@@ -1239,24 +1212,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (networkText) networkText.textContent = 'Sincronizando...';
         if (networkStatus) networkStatus.className = 'network-badge offline';
 
-        // Enviar cola al servidor personal con fallback local
-        setTimeout(async () => {
-            try {
-                const response = await fetch('http://localhost:3000/api/sync', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ username: loggedUser, queue: queue })
-                });
-                if (response.ok) {
-                    console.log('Sincronización diferida completada con el servidor personal.');
-                }
-            } catch (err) {
-                console.warn('Servidor personal de sincronización no disponible. Sincronización diferida completada en modo cliente local.');
-            }
-
+        // La sincronización es 100% local (no hay backend propio, según pide el
+        // enunciado). Se simula una sincronización diferida con un pequeño retardo
+        // y se registra el resultado en el historial local.
+        setTimeout(() => {
             console.log(`Sincronizados ${queue.length} cambios:`, queue);
 
             // Save to history
