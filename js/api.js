@@ -1,76 +1,83 @@
 // js/api.js
-
-/**
- * Módulo para interactuar con la API de Deezer.
- * Utiliza un proxy CORS para evitar bloqueos del navegador.
- */
+//
+// Módulo de acceso a la API de Deezer mediante JSONP.
+//
+// ¿Por qué JSONP y no fetch? La API de Deezer (api.deezer.com) no envía la
+// cabecera "Access-Control-Allow-Origin", así que el navegador bloquea por CORS
+// cualquier fetch directo. JSONP esquiva ese bloqueo porque las etiquetas
+// <script> no están sujetas a la política de mismo origen: Deezer responde con
+// callback({...}) y nosotros recibimos los datos. Todo ocurre en el cliente,
+// sin proxies de terceros ni servidor propio.
 const DeezerAPI = (() => {
     const BASE_URL = 'https://api.deezer.com';
-    const CORS_PROXY = 'https://corsproxy.io/?';
+    const TIMEOUT_MS = 10000;
 
     /**
-     * Realiza una petición a la API de Deezer a través de un proxy CORS
-     * @param {string} endpoint - Ejemplo: '/search/artist'
-     * @param {object} params - Parámetros de consulta
-     * @returns {Promise}
+     * Petición JSONP genérica a la API de Deezer.
+     * @param {string} endpoint  Ej: '/search/artist'
+     * @param {object} params    Parámetros de consulta (ej: { q: 'daft punk' })
+     * @returns {Promise<object>} La respuesta JSON de Deezer (con su campo .data)
      */
-    const fetchAPI = async (endpoint, params = {}) => {
-        try {
-            // Build URL
-            const urlObj = new URL(BASE_URL + endpoint);
-            Object.keys(params).forEach(key => urlObj.searchParams.append(key, params[key]));
-            
-            // Encode the full Deezer URL and append to proxy
-            const finalUrl = CORS_PROXY + encodeURIComponent(urlObj.toString());
+    function request(endpoint, params = {}) {
+        return new Promise((resolve, reject) => {
+            if (!navigator.onLine) {
+                reject(new Error('OFFLINE'));
+                return;
+            }
 
-            const response = await fetch(finalUrl);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.error) {
-                throw new Error(data.error.message || "Error en la API de Deezer");
-            }
-            
-            return data;
-        } catch (error) {
-            console.error("API Request Failed:", error);
-            throw error;
-        }
-    };
+            const callbackName = 'deezerCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+            const script = document.createElement('script');
+            let finished = false;
+
+            const cleanup = () => {
+                delete window[callbackName];
+                if (script.parentNode) script.parentNode.removeChild(script);
+                clearTimeout(timer);
+            };
+
+            const timer = setTimeout(() => {
+                if (finished) return;
+                finished = true;
+                cleanup();
+                reject(new Error('Tiempo de espera agotado al consultar Deezer'));
+            }, TIMEOUT_MS);
+
+            // Deezer llamará a esta función global con los datos
+            window[callbackName] = (data) => {
+                if (finished) return;
+                finished = true;
+                cleanup();
+                if (data && data.error) {
+                    reject(new Error(data.error.message || 'Error devuelto por Deezer'));
+                } else {
+                    resolve(data);
+                }
+            };
+
+            const query = new URLSearchParams({ ...params, output: 'jsonp', callback: callbackName });
+            script.src = `${BASE_URL}${endpoint}?${query.toString()}`;
+            script.onerror = () => {
+                if (finished) return;
+                finished = true;
+                cleanup();
+                reject(new Error('No se pudo conectar con Deezer'));
+            };
+            document.body.appendChild(script);
+        });
+    }
 
     return {
-        /**
-         * Buscar artistas por nombre
-         */
-        searchArtists: async (query) => {
-            if (!query) return { data: [] };
-            return await fetchAPI('/search/artist', { q: query });
-        },
-
-        /**
-         * Obtener detalles de un artista
-         */
-        getArtist: async (artistId) => {
-            return await fetchAPI(`/artist/${artistId}`);
-        },
-
-        /**
-         * Obtener álbumes de un artista
-         */
-        getArtistAlbums: async (artistId) => {
-            // Limit to top 50 for simplicity
-            return await fetchAPI(`/artist/${artistId}/albums`, { limit: 50 });
-        },
-
-        /**
-         * Obtener pistas (tracks) de un álbum
-         */
-        getAlbumTracks: async (albumId) => {
-            return await fetchAPI(`/album/${albumId}/tracks`);
-        }
+        request,
+        // Buscar artistas por nombre
+        searchArtists: (queryText) => request('/search/artist', { q: queryText }),
+        // Artistas más populares (para la sección de tendencias)
+        getTrendingArtists: (limit = 12) => request('/chart/0/artists', { limit }),
+        // Discografía de un artista
+        getArtistAlbums: (artistId) => request(`/artist/${artistId}/albums`, { limit: 50 }),
+        // Pistas de un álbum
+        getAlbumTracks: (albumId) => request(`/album/${albumId}/tracks`)
     };
 })();
+
+// Exponer el módulo como global para que dashboard.js lo use en cualquier navegador
+window.DeezerAPI = DeezerAPI;

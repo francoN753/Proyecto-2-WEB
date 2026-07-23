@@ -1,16 +1,16 @@
-const CACHE_NAME = 'deezer-manager-v3';
+const CACHE_NAME = 'deezer-manager-v7';
 const ASSETS = [
     './',
     './index.html',
-    './app.html',
+    './dashboard.html',
     './css/reset.css',
     './css/variables.css',
     './css/layout.css',
     './css/components.css',
+    './css/animations.css',
     './js/auth.js',
-    './js/app.js',
     './js/api.js',
-    './js/storage.js',
+    './js/dashboard.js',
     './manifest.json'
 ];
 
@@ -53,6 +53,7 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
         fetch(e.request)
             .then(fetchRes => {
+                if (!e.request.url.startsWith('http')) return fetchRes;
                 return caches.open(CACHE_NAME).then(cache => {
                     cache.put(e.request, fetchRes.clone());
                     return fetchRes;

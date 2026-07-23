@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="./css/variables.css">
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/animations.css">
     <link rel="manifest" href="./manifest.json">
+    <script src="https://unpkg.com/reicon/cdn/reicon.js"></script>
 </head>
 <body class="login-layout">
 
@@ -17,11 +19,7 @@
         <!-- Logo & Title -->
         <div class="login-header">
             <div class="login-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 18V5l12-2v13"></path>
-                    <circle cx="6" cy="18" r="3"></circle>
-                    <circle cx="18" cy="16" r="3"></circle>
-                </svg>
+                <re-icon icon="music-notes" weight="outline" size="32" color="currentColor"></re-icon>
             </div>
             <h1>Deezer-Manager</h1>
             <p class="subtitle">Gestión Musical Avanzada</p>
@@ -32,7 +30,7 @@
             <div class="form-group">
                 <label for="username">Usuario</label>
                 <div class="input-wrapper">
-                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <re-icon class="input-icon" icon="user" weight="outline" size="16"></re-icon>
                     <input type="text" id="username" name="username" value="admin" required autocomplete="username" placeholder="Ingresa tu usuario">
                 </div>
             </div>
@@ -40,7 +38,7 @@
             <div class="form-group">
                 <label for="password">Contraseña</label>
                 <div class="input-wrapper">
-                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <re-icon class="input-icon" icon="lock-keyhole" weight="outline" size="16"></re-icon>
                     <input type="password" id="password" name="password" value="12345" required autocomplete="current-password" placeholder="Ingresa tu contraseña">
                 </div>
             </div>
@@ -54,7 +52,7 @@
 
     <!-- Theme toggle -->
     <button id="theme-toggle" class="theme-toggle-floating" aria-label="Cambiar tema">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <re-icon class="moon-icon" icon="moon" weight="outline" size="20"></re-icon>
     </button>
 
     <script src="./js/auth.js"></script>

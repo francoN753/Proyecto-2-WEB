@@ -9,15 +9,16 @@
     <link rel="stylesheet" href="./css/variables.css">
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/animations.css">
     <link rel="manifest" href="./manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/reicon/cdn/reicon.js"></script>
 </head>
 <body class="dashboard-layout">
 
     <!-- ========== OFFLINE BANNER ========== -->
-    <div id="offline-banner" class="offline-banner hidden">⚠ Sin conexión: los cambios se sincronizarán al volver a línea</div>
+    <div id="offline-banner" class="offline-banner hidden"><re-icon icon="danger-triangle" weight="outline" size="1em" style="vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Sin conexión: los cambios se sincronizarán al volver a línea</div>
 
     <!-- ========== TOP BAR ========== -->
     <header class="top-bar">
@@ -34,7 +35,7 @@
 
         <!-- Search -->
         <form id="search-form" class="top-search-form" role="search">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon"><re-icon icon="magnifier" weight="outline" size="16"></re-icon></span>
             <input type="search" id="search-input" placeholder="Buscar artistas..." autocomplete="off">
         </form>
 
@@ -43,8 +44,8 @@
                 <span class="network-dot"></span>
                 <span class="network-text">Online</span>
             </div>
-            <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema">🌙</button>
-            <span id="wifi-icon" style="font-size:1.1rem; color:var(--text-secondary); cursor:default;">📶</span>
+            <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema"><re-icon icon="moon" weight="outline" size="20"></re-icon></button>
+            <span id="wifi-icon" style="color:var(--text-secondary); cursor:default; display:inline-flex;"><re-icon icon="wifi" weight="outline" size="18"></re-icon></span>
             <div class="user-avatar-wrapper">
                 <div class="user-avatar" id="user-avatar-btn">U</div>
                 <div class="user-dropdown hidden" id="user-dropdown">
@@ -52,8 +53,8 @@
                         <div class="user-name" id="dropdown-username">Usuario</div>
                         <div class="user-email" id="dropdown-email">usuario@email.com</div>
                     </div>
-                    <button class="user-dropdown-item" id="dropdown-theme-toggle">🌙 Cambiar tema</button>
-                    <button class="user-dropdown-item danger" id="logout-btn">🚪 Cerrar sesión</button>
+                    <button class="user-dropdown-item" id="dropdown-theme-toggle"><re-icon icon="moon" weight="outline" size="1em" style="vertical-align: middle; margin-right: 0.5rem;"></re-icon> Cambiar tema</button>
+                    <button class="user-dropdown-item danger" id="logout-btn"><re-icon icon="logout" weight="outline" size="1em" style="vertical-align: middle; margin-right: 0.5rem;"></re-icon> Cerrar sesión</button>
                 </div>
             </div>
         </div>
@@ -62,16 +63,16 @@
     <!-- ========== SIDEBAR ========== -->
     <aside class="sidebar">
         <button class="sidebar-link active" data-view="search-view" id="side-search">
-            <span class="sidebar-icon">🔍</span> Descubrir
+            <span class="sidebar-icon"><re-icon icon="magnifier" weight="outline" size="20"></re-icon></span> Descubrir
         </button>
         <button class="sidebar-link" data-view="favorites-view" id="side-favorites">
-            <span class="sidebar-icon">❤️</span> Favoritos
+            <span class="sidebar-icon"><re-icon icon="heart" weight="outline" size="20"></re-icon></span> Favoritos
         </button>
         <button class="sidebar-link" data-view="collection-view" id="side-collection">
-            <span class="sidebar-icon">📚</span> Colección
+            <span class="sidebar-icon"><re-icon icon="album" weight="outline" size="20"></re-icon></span> Colección
         </button>
         <button class="sidebar-link" data-view="sync-view" id="side-sync">
-            <span class="sidebar-icon">🔄</span> Sincronización
+            <span class="sidebar-icon"><re-icon icon="refresh" weight="outline" size="20"></re-icon></span> Sincronización
         </button>
 
         <div class="sidebar-spacer"></div>
@@ -83,7 +84,7 @@
 
         <div class="sidebar-logout">
             <button class="sidebar-link" id="sidebar-logout-btn" style="color: var(--color-danger);">
-                <span class="sidebar-icon">🚪</span> Cerrar Sesión
+                <span class="sidebar-icon"><re-icon icon="logout" weight="outline" size="20"></re-icon></span> Cerrar Sesión
             </button>
         </div>
     </aside>
@@ -101,7 +102,7 @@
 
             <!-- Default empty state (shown while trending loads or if offline) -->
             <div id="search-empty-state" class="status-container hidden">
-                <div class="status-icon">🎧</div>
+                <div class="status-icon"><re-icon icon="music-notes" weight="outline" size="48"></re-icon></div>
                 <h2 style="font-weight:700; font-size:1.25rem;">Busca tu artista favorito</h2>
                 <p class="status-message">Ingresa un nombre en la barra superior para comenzar la gestión.</p>
             </div>
@@ -110,7 +111,7 @@
             <div id="trending-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
                     <div>
-                        <h2 style="font-weight:800; font-size:1.35rem;">🔥 Artistas en Tendencia</h2>
+                        <h2 style="font-weight:800; font-size:1.35rem;"><re-icon icon="fire" weight="filled" size="1em" style="color: var(--color-warning); vertical-align: text-bottom;"></re-icon> Artistas en Tendencia</h2>
                         <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.25rem;">Artistas populares en Deezer ahora mismo</p>
                     </div>
                 </div>
@@ -129,15 +130,18 @@
                 <p id="search-results-count" style="font-size:0.85rem; color:var(--accent-cyan);">0 encontrados</p>
             </div>
 
+            <!-- Grilla de artistas encontrados -->
+            <div id="search-results-grid" class="albums-grid hidden"></div>
+
             <!-- Artist Detail -->
             <div id="artist-detail" class="hidden">
                 <div class="artist-hero">
                     <img id="artist-image" src="" alt="Artista" class="artist-img-round">
-                    <span class="artist-hero-badge">✅ Artista Verificado</span>
+                    <span class="artist-hero-badge"><re-icon icon="check-circle" weight="filled" size="1em" style="vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Artista Verificado</span>
                     <h1 id="artist-name">Nombre del Artista</h1>
                     <div class="artist-hero-meta">
                         <span id="artist-fans">0 oyentes mensuales</span>
-                        <button class="btn-play-hero" id="btn-play-artist">▶ Reproducir</button>
+                        <button class="btn-play-hero" id="btn-play-artist"><re-icon icon="play" weight="filled" size="1em" style="vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Reproducir</button>
                     </div>
                 </div>
 
@@ -153,7 +157,7 @@
             <div class="fav-header">
                 <div>
                     <h1>Favoritos</h1>
-                    <div class="section-subtitle">🟢 Sincronización local activa</div>
+                    <div class="section-subtitle"><re-icon icon="check-circle" weight="filled" size="1em" style="color: var(--color-success); vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Sincronización local activa</div>
                 </div>
                 <div class="filter-group">
                     <select id="rating-filter" class="filter-select">
@@ -169,7 +173,7 @@
             </div>
 
             <div id="favorites-empty" class="status-container">
-                <div class="status-icon">📂</div>
+                <div class="status-icon"><re-icon icon="folder" weight="outline" size="48"></re-icon></div>
                 <p class="status-message">Aún no has agregado álbumes a favoritos.</p>
                 <button id="go-to-search-btn" class="btn-primary" style="width:auto; margin-top:0.75rem;">Buscar Artistas</button>
             </div>
@@ -181,14 +185,14 @@
             <div class="collection-header">
                 <div>
                     <h1>Mi Biblioteca Offline</h1>
-                    <div class="section-subtitle">📥 Accediendo a contenido descargado y caché local</div>
+                    <div class="section-subtitle"><re-icon icon="archive-down" weight="outline" size="1em" style="vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Accediendo a contenido descargado y caché local</div>
                 </div>
-                <button class="btn-primary" style="width:auto;" id="collection-play-all-btn">▶ Reproducir Todo</button>
+                <button class="btn-primary" style="width:auto;" id="collection-play-all-btn"><re-icon icon="play" weight="filled" size="1em" style="vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Reproducir Todo</button>
             </div>
 
             <!-- Change notification -->
             <div id="collection-notification" class="change-notification hidden">
-                <div class="change-notification-icon">💾</div>
+                <div class="change-notification-icon"><re-icon icon="save" weight="outline" size="24"></re-icon></div>
                 <div class="change-notification-text">
                     <h4 id="notification-title">Cambio guardado localmente</h4>
                     <p id="notification-desc">La calificación se ha actualizado en este dispositivo.</p>
@@ -207,7 +211,7 @@
                         <!-- Populated by JS -->
                     </div>
                     <div id="collection-empty" class="status-container" style="padding:2rem;">
-                        <div class="status-icon">💾</div>
+                        <div class="status-icon"><re-icon icon="save" weight="outline" size="48"></re-icon></div>
                         <p class="status-message">Tu biblioteca offline se poblará automáticamente con los álbumes que visites mientras estés conectado.</p>
                     </div>
                 </div>
@@ -228,15 +232,15 @@
                         <div class="sidebar-card-title">Sincronización</div>
                         <div style="display:flex; flex-direction:column; gap:0.4rem;">
                             <div class="sync-info-item" id="sync-ratings-info">
-                                <span class="sync-icon">⭐</span>
+                                <span class="sync-icon"><re-icon icon="star" weight="filled" size="16"></re-icon></span>
                                 <span>Calificaciones: al día</span>
                             </div>
                             <div class="sync-info-item" id="sync-favs-info">
-                                <span class="sync-icon">❤️</span>
+                                <span class="sync-icon"><re-icon icon="heart" weight="filled" size="16"></re-icon></span>
                                 <span>Favoritos: al día</span>
                             </div>
                             <div class="sync-info-item" id="sync-cache-info">
-                                <span class="sync-icon">💾</span>
+                                <span class="sync-icon"><re-icon icon="save" weight="outline" size="16"></re-icon></span>
                                 <span>Caché de carátulas: Al día</span>
                             </div>
                         </div>
@@ -244,7 +248,7 @@
 
                     <!-- Now Playing Mini Card -->
                     <div class="now-playing-card hidden" id="now-playing-mini">
-                        <div class="now-playing-icon">🎵</div>
+                        <div class="now-playing-icon"><re-icon icon="music-notes" weight="outline" size="24"></re-icon></div>
                         <div class="now-playing-text">
                             <span class="now-playing-label">Escuchando ahora</span>
                             <span class="now-playing-title" id="now-playing-title">—</span>
@@ -257,14 +261,14 @@
         <!-- ────────── VIEW: SINCRONIZACIÓN ────────── -->
         <section id="sync-view" class="view-section hidden">
             <h1 style="font-size:1.75rem; font-weight:800;">Sincronización</h1>
-            <div class="section-subtitle" style="margin-bottom:1.5rem;">🔄 Estado de sincronización con el servidor</div>
+            <div class="section-subtitle" style="margin-bottom:1.5rem;"><re-icon icon="refresh" weight="outline" size="1em" style="vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Estado de sincronización con el servidor</div>
 
             <div class="sync-cards">
                 <div class="sync-card">
                     <h3>Cola de Sincronización</h3>
                     <p id="sync-queue-count" style="color:var(--text-secondary); font-size:0.9rem;">No hay cambios pendientes.</p>
                     <div id="sync-queue-list" style="margin-top:0.75rem; display:flex; flex-direction:column; gap:0.5rem;"></div>
-                    <button class="sync-btn-outline" id="sync-now-btn" style="margin-top:1rem;">🔄 Sincronizar ahora</button>
+                    <button class="sync-btn-outline" id="sync-now-btn" style="margin-top:1rem;"><re-icon icon="refresh" weight="outline" size="1em" style="vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Sincronizar ahora</button>
                 </div>
 
                 <div class="sync-card">
@@ -317,9 +321,9 @@
                         <span id="detail-duration">0 min</span>
                     </div>
                     <div class="album-detail-actions">
-                        <button class="btn-primary" style="width:auto;" id="detail-play-btn">▶ Reproducir</button>
-                        <button class="btn-icon-sm" id="detail-fav-btn" aria-label="Favorito">🤍</button>
-                        <button class="btn-icon-sm" id="detail-more-btn" aria-label="Más opciones">⋯</button>
+                        <button class="btn-primary" style="width:auto;" id="detail-play-btn"><re-icon icon="play" weight="filled" size="1em" style="vertical-align: text-bottom; margin-right: 0.25rem;"></re-icon> Reproducir</button>
+                        <button class="btn-icon-sm" id="detail-fav-btn" aria-label="Favorito"><re-icon icon="heart" weight="outline" size="16"></re-icon></button>
+                        <button class="btn-icon-sm" id="detail-more-btn" aria-label="Más opciones"><re-icon icon="menu-dots" weight="outline" size="16"></re-icon></button>
                     </div>
                 </div>
             </div>
@@ -331,7 +335,7 @@
                         <span>#</span>
                         <span>Título</span>
                         <span>Reproducciones</span>
-                        <span>⏱</span>
+                        <span><re-icon icon="clock" weight="outline" size="16"></re-icon></span>
                     </div>
                     <div id="detail-tracklist" class="tracks-list">
                         <!-- Populated by JS -->
@@ -356,11 +360,11 @@
                         <div class="sidebar-card-title">Rating del Álbum</div>
                         <div id="detail-rating-container" style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
                             <div class="star-rating" id="detail-star-rating" style="font-size:1.5rem;">
-                                <span class="star interactive" data-value="1">★</span>
-                                <span class="star interactive" data-value="2">★</span>
-                                <span class="star interactive" data-value="3">★</span>
-                                <span class="star interactive" data-value="4">★</span>
-                                <span class="star interactive" data-value="5">★</span>
+                                <span class="star interactive" data-value="1"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
+                                <span class="star interactive" data-value="2"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
+                                <span class="star interactive" data-value="3"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
+                                <span class="star interactive" data-value="4"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
+                                <span class="star interactive" data-value="5"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
                             </div>
                             <p id="detail-rating-text" style="font-size:0.75rem; color:var(--text-tertiary);">Haz clic para calificar</p>
                         </div>
@@ -380,16 +384,16 @@
                 <span id="player-title" class="player-track-title">Sin reproducción</span>
                 <span id="player-artist" class="player-track-artist">—</span>
             </div>
-            <button class="player-fav-btn" id="player-fav-btn" aria-label="Favorito">🤍</button>
+            <button class="player-fav-btn" id="player-fav-btn" aria-label="Favorito"><re-icon icon="heart" weight="outline" size="18"></re-icon></button>
         </div>
 
         <div class="player-center">
             <div class="player-buttons">
-                <button class="btn-player" id="player-shuffle-btn" aria-label="Aleatorio">🔀</button>
-                <button class="btn-player" id="player-prev-btn" aria-label="Anterior">⏮</button>
-                <button id="player-play-pause" class="btn-play-main" aria-label="Play/Pause">▶</button>
-                <button class="btn-player" id="player-next-btn" aria-label="Siguiente">⏭</button>
-                <button class="btn-player" id="player-repeat-btn" aria-label="Repetir">🔁</button>
+                <button class="btn-player" id="player-shuffle-btn" aria-label="Aleatorio"><re-icon icon="shuffle" weight="outline" size="18"></re-icon></button>
+                <button class="btn-player" id="player-prev-btn" aria-label="Anterior"><re-icon icon="skip-back" weight="filled" size="20"></re-icon></button>
+                <button id="player-play-pause" class="btn-play-main" aria-label="Play/Pause"><re-icon icon="play" weight="filled" size="22"></re-icon></button>
+                <button class="btn-player" id="player-next-btn" aria-label="Siguiente"><re-icon icon="skip-forward" weight="filled" size="20"></re-icon></button>
+                <button class="btn-player" id="player-repeat-btn" aria-label="Repetir"><re-icon icon="repeat" weight="outline" size="18"></re-icon></button>
             </div>
             <div class="player-timeline">
                 <span id="player-time-current" class="time-stamp">0:00</span>
@@ -399,24 +403,25 @@
         </div>
 
         <div class="player-right">
-            <button class="btn-player" id="player-queue-btn" aria-label="Cola">🗒️</button>
-            <button class="btn-player" id="player-devices-btn" aria-label="Dispositivos">🖥️</button>
-            <button id="player-mute-btn" class="btn-player" aria-label="Volumen">🔊</button>
+            <button class="btn-player" id="player-queue-btn" aria-label="Cola"><re-icon icon="list" weight="outline" size="18"></re-icon></button>
+            <button class="btn-player" id="player-devices-btn" aria-label="Dispositivos"><re-icon icon="monitor" weight="outline" size="18"></re-icon></button>
+            <button id="player-mute-btn" class="btn-player" aria-label="Volumen"><re-icon icon="volume-high" weight="outline" size="18"></re-icon></button>
             <input type="range" id="player-volume" class="player-slider volume-slider" value="80" min="0" max="100">
-            <button class="btn-player" id="player-fullscreen-btn" aria-label="Pantalla completa">⛶</button>
+            <button class="btn-player" id="player-fullscreen-btn" aria-label="Pantalla completa"><re-icon icon="maximize" weight="outline" size="18"></re-icon></button>
         </div>
     </footer>
 
     <!-- ========== MOBILE BOTTOM NAV ========== -->
     <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-        <button class="mobile-nav-btn active" data-view="search-view">🔍<span>Descubrir</span></button>
-        <button class="mobile-nav-btn" data-view="favorites-view">❤️<span>Favoritos</span></button>
-        <button class="mobile-nav-btn" data-view="collection-view">📚<span>Colección</span></button>
-        <button class="mobile-nav-btn" data-view="sync-view">🔄<span>Sync</span></button>
+        <button class="mobile-nav-btn active" data-view="search-view"><re-icon icon="magnifier" weight="outline" size="20"></re-icon><span>Descubrir</span></button>
+        <button class="mobile-nav-btn" data-view="favorites-view"><re-icon icon="heart" weight="outline" size="20"></re-icon><span>Favoritos</span></button>
+        <button class="mobile-nav-btn" data-view="collection-view"><re-icon icon="album" weight="outline" size="20"></re-icon><span>Colección</span></button>
+        <button class="mobile-nav-btn" data-view="sync-view"><re-icon icon="refresh" weight="outline" size="20"></re-icon><span>Sync</span></button>
     </nav>
 
     <div id="toast-container"></div>
 
+    <script src="./js/api.js"></script>
     <script src="./js/dashboard.js"></script>
     <script>
         if ('serviceWorker' in navigator) {

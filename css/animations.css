@@ -1,0 +1,32 @@
+/* css/animations.css — animaciones de interfaz (CSS puro) */
+
+/* ─── Cambio de tema con revelado circular (View Transitions API) ───
+   En navegadores que soportan document.startViewTransition (Chrome/Edge),
+   el nuevo tema se revela en un círculo que crece desde el botón que se
+   pulsó. En los que no la soportan (Firefox/Safari), el tema cambia igual,
+   solo que sin la animación. Basado en la técnica de theme-toggle.rdsx.dev. */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+    z-index: 0;
+}
+
+::view-transition-new(root) {
+    z-index: 1;
+    animation: theme-reveal 0.45s ease-in-out;
+}
+
+@keyframes theme-reveal {
+    from { clip-path: circle(0% at var(--theme-x, 50%) var(--theme-y, 50%)); }
+    to   { clip-path: circle(160% at var(--theme-x, 50%) var(--theme-y, 50%)); }
+}
+
+/* ─── Aparición suave de tarjetas (uso opcional desde las grillas) ─── */
+@keyframes slide-in-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

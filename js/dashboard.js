@@ -58,6 +58,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownThemeToggle = document.getElementById('dropdown-theme-toggle');
     const htmlElement = document.documentElement;
 
+    // Iconos SVG del botón de tema (estilo línea, sin emojis).
+    // Se declaran antes de la primera llamada a updateThemeUI().
+    const SUN_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+    const MOON_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+
+    // Iconos de corazón para favoritos (contorno = no guardado, relleno = guardado)
+    const HEART_OUTLINE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
+    const HEART_FILLED = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
+
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
         htmlElement.setAttribute('data-theme', savedTheme);
@@ -67,23 +76,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateThemeUI();
 
-    function toggleTheme() {
+    function toggleTheme(event) {
         const current = htmlElement.getAttribute('data-theme');
         const newTheme = current === 'light' ? 'dark' : 'light';
-        htmlElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeUI();
-        showToast(`Tema cambiado a modo ${newTheme === 'light' ? 'claro' : 'oscuro'}`, 'success', 2000);
+
+        // Origen del círculo de revelado = punto donde se hizo clic
+        if (event) {
+            htmlElement.style.setProperty('--theme-x', event.clientX + 'px');
+            htmlElement.style.setProperty('--theme-y', event.clientY + 'px');
+        }
+
+        const applyTheme = () => {
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeUI();
+        };
+
+        // Revelado circular si el navegador soporta View Transitions; si no, cambio directo
+        if (document.startViewTransition) {
+            document.startViewTransition(applyTheme);
+        } else {
+            applyTheme();
+        }
     }
 
     function updateThemeUI() {
         const theme = htmlElement.getAttribute('data-theme');
-        if (themeToggleBtn) themeToggleBtn.textContent = theme === 'light' ? '🌙' : '☀️';
-        if (dropdownThemeToggle) dropdownThemeToggle.textContent = theme === 'light' ? '🌙 Modo Oscuro' : '☀️ Modo Claro';
+        // En modo claro se ofrece pasar a oscuro (luna); en oscuro, a claro (sol)
+        if (themeToggleBtn) themeToggleBtn.innerHTML = theme === 'light' ? MOON_ICON : SUN_ICON;
+        if (dropdownThemeToggle) dropdownThemeToggle.textContent = theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
     }
 
-    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
-    if (dropdownThemeToggle) dropdownThemeToggle.addEventListener('click', toggleTheme);
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', (e) => toggleTheme(e));
+    if (dropdownThemeToggle) dropdownThemeToggle.addEventListener('click', (e) => toggleTheme(e));
 
 
     /* ====================================================
@@ -146,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
 
-        const icons = { success: '✅', warning: '⚠️', danger: '❌', info: '🔔' };
-        const icon = icons[type] || '🔔';
+        const icons = { success: '<re-icon icon="check-circle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>', warning: '<re-icon icon="danger-triangle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>', danger: '<re-icon icon="close-circle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>', info: '<re-icon icon="bell" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>' };
+        const icon = icons[type] || '<re-icon icon="bell" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>';
 
         toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
         toastContainer.appendChild(toast);
@@ -194,36 +219,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /* ====================================================
-       6. FETCH CLIENT (Bypass CORS for Deezer API)
+       6. CLIENTE DE API
+       Las peticiones a Deezer se hacen con JSONP desde el módulo
+       DeezerAPI (js/api.js), que evita el bloqueo CORS sin usar
+       proxies de terceros ni un servidor propio.
        ==================================================== */
-    async function fetchJSONP(url) {
-        if (!navigator.onLine) {
-            throw new Error('OFFLINE');
-        }
-
-        try {
-            // Using a CORS proxy instead of JSONP for reliability and SW compatibility
-            const CORS_PROXY = 'https://corsproxy.io/?';
-            const finalUrl = CORS_PROXY + encodeURIComponent(url);
-            
-            const response = await fetch(finalUrl);
-            
-            if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.error) {
-                throw new Error(data.error.message || "Error devuelto por Deezer");
-            }
-            
-            return data;
-        } catch (error) {
-            console.error("Error consultando la API:", error);
-            throw new Error('Error de red al consultar el servidor de Deezer');
-        }
-    }
 
 
     /* ====================================================
@@ -241,6 +241,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchResultsCount = document.getElementById('search-results-count');
 
     let currentArtist = null;
+    const searchResultsGrid = document.getElementById('search-results-grid');
+
+    // Tarjeta de artista reutilizable (para búsqueda y tendencias)
+    function createArtistCard(artist, onSelect) {
+        const card = document.createElement('div');
+        card.className = 'album-card';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+            <div class="album-art-container">
+                <img class="album-art" src="${artist.picture_medium || artist.picture || ''}"
+                     alt="${artist.name}" loading="lazy"
+                     style="border-radius:50%; aspect-ratio:1; object-fit:cover;">
+            </div>
+            <div class="album-info-container" style="text-align:center;">
+                <h3 class="album-title">${artist.name}</h3>
+                <p class="album-artist-name">${(artist.nb_fan || 0).toLocaleString()} fans</p>
+            </div>
+        `;
+        card.addEventListener('click', () => onSelect(artist));
+        return card;
+    }
+
+    // Renderiza la grilla con TODOS los artistas encontrados en la búsqueda.
+    // Al hacer clic en uno se abre su detalle (discografía).
+    function renderArtistResults(artists) {
+        if (trendingSection) trendingSection.classList.add('hidden');
+        artistDetail.classList.add('hidden');
+        if (!searchResultsGrid) return;
+        searchResultsGrid.innerHTML = '';
+        searchResultsGrid.classList.remove('hidden');
+        artists.forEach(artist => {
+            const card = createArtistCard(artist, (selected) => {
+                currentArtist = selected;
+                searchResultsGrid.classList.add('hidden');
+                if (searchResultsHeader) searchResultsHeader.classList.add('hidden');
+                renderArtist(selected);
+            });
+            searchResultsGrid.appendChild(card);
+        });
+    }
 
     if (searchForm) {
         searchForm.addEventListener('submit', async (e) => {
@@ -264,8 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const searchUrl = `https://api.deezer.com/search/artist?q=${encodeURIComponent(query)}`;
-                const data = await fetchJSONP(searchUrl);
+                const data = await DeezerAPI.searchArtists(query);
 
                 searchSpinner.classList.remove('active');
 
@@ -273,13 +312,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     statusContainer.classList.add('hidden');
                     if (searchResultsHeader) {
                         searchResultsHeader.classList.remove('hidden');
-                        searchResultsCount.textContent = `${data.data.length} encontrado${data.data.length > 1 ? 's' : ''}`;
+                        searchResultsCount.textContent = `${data.data.length} artista${data.data.length > 1 ? 's' : ''} encontrado${data.data.length > 1 ? 's' : ''} para "${query}"`;
                     }
-                    const artist = data.data[0];
-                    currentArtist = artist;
-                    renderArtist(artist);
+                    renderArtistResults(data.data);
                 } else {
-                    statusMessage.textContent = `No se encontraron resultados para "${query}". Intenta buscar otro artista (ej. Daft Punk, Tame Impala).`;
+                    if (searchResultsGrid) searchResultsGrid.classList.add('hidden');
+                    if (searchResultsHeader) searchResultsHeader.classList.add('hidden');
+                    statusMessage.textContent = `No se encontraron resultados para "${query}". Intenta con otro artista (ej. Daft Punk, Tame Impala).`;
                 }
             } catch (error) {
                 searchSpinner.classList.remove('active');
@@ -294,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 artistDetail.classList.add('hidden');
                 statusContainer.classList.add('hidden');
                 if (searchResultsHeader) searchResultsHeader.classList.add('hidden');
+                if (searchResultsGrid) searchResultsGrid.classList.add('hidden');
                 // Show trending section again
                 const trendingSection = document.getElementById('trending-section');
                 if (trendingSection) trendingSection.classList.remove('hidden');
@@ -320,37 +360,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Deezer chart endpoint returns the most popular artists globally
-            const data = await fetchJSONP('https://api.deezer.com/chart/0/artists?limit=12');
+            const data = await DeezerAPI.getTrendingArtists(12);
 
             if (data.data && data.data.length > 0) {
                 trendingGrid.innerHTML = '';
 
                 data.data.forEach(artist => {
-                    const card = document.createElement('div');
-                    card.className = 'album-card';
-                    card.style.cursor = 'pointer';
-
-                    card.innerHTML = `
-                        <div class="album-art-container">
-                            <img class="album-art" src="${artist.picture_medium || artist.picture || ''}" 
-                                 alt="${artist.name}" loading="lazy"
-                                 style="border-radius:50%; aspect-ratio:1; object-fit:cover;">
-                        </div>
-                        <div class="album-info-container" style="text-align:center;">
-                            <h3 class="album-title">${artist.name}</h3>
-                            <p class="album-artist-name">${(artist.nb_fan || 0).toLocaleString()} fans</p>
-                        </div>
-                    `;
-
-                    // Click on trending artist → search for them
-                    card.addEventListener('click', () => {
-                        currentArtist = artist;
-                        if (searchInput) searchInput.value = artist.name;
-                        // Hide trending, show artist detail
+                    const card = createArtistCard(artist, (selected) => {
+                        currentArtist = selected;
+                        if (searchInput) searchInput.value = selected.name;
+                        // Ocultar tendencias y mostrar el detalle del artista
                         if (trendingSection) trendingSection.classList.add('hidden');
-                        renderArtist(artist);
+                        renderArtist(selected);
                     });
-
                     trendingGrid.appendChild(card);
                 });
             } else {
@@ -389,10 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Load albums
         albumsGrid.innerHTML = '';
-        const albumsUrl = `https://api.deezer.com/artist/${artist.id}/albums`;
 
         try {
-            const data = await fetchJSONP(albumsUrl);
+            const data = await DeezerAPI.getArtistAlbums(artist.id);
             if (data.data && data.data.length > 0) {
                 const sortedAlbums = data.data.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
                 sortedAlbums.forEach(album => {
@@ -441,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="album-art-container">
                 <img class="album-art" src="${album.cover_medium || album.cover || ''}" alt="Portada de ${album.title}" loading="lazy">
                 <button class="btn-fav ${isFav ? 'active' : ''}" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}" title="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
-                    ${isFav ? '❤️' : '🤍'}
+                    ${isFav ? '<re-icon icon="heart" weight="filled" size="1em"></re-icon>' : '<re-icon icon="heart" weight="outline" size="1em"></re-icon>'}
                 </button>
                 ${isFavoriteView ? '<span class="album-badge-local">LOCAL</span>' : ''}
             </div>
@@ -453,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${isFav ? `
                     <div class="star-rating" data-album-id="${album.id}">
                         ${[1, 2, 3, 4, 5].map(num => `
-                            <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}">★</span>
+                            <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
                         `).join('')}
                     </div>
                     <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">${rating > 0 ? rating.toFixed(1) : ''}</span>
@@ -501,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveFavorites(favorites);
 
             favBtn.classList.remove('active');
-            favBtn.innerHTML = '🤍';
+            if(favBtn) favBtn.innerHTML = '<re-icon icon="heart" weight="outline" size="1em"></re-icon>';
 
             showToast(`"${album.title}" eliminado de tus favoritos`, 'info');
 
@@ -531,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveFavorites(favorites);
 
             favBtn.classList.add('active');
-            favBtn.innerHTML = '❤️';
+            if(favBtn) favBtn.innerHTML = '<re-icon icon="heart" weight="filled" size="1em"></re-icon>';
 
             showToast(`"${album.title}" guardado en favoritos`, 'success');
 
@@ -639,14 +660,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const isFav = !!favorites[album.id];
         const detailFavBtn = document.getElementById('detail-fav-btn');
         if (detailFavBtn) {
-            detailFavBtn.textContent = isFav ? '❤️' : '🤍';
+            detailFavBtn.innerHTML = isFav ? '<re-icon icon="heart" weight="filled" size="1em"></re-icon>' : '<re-icon icon="heart" weight="outline" size="1em"></re-icon>';
             detailFavBtn.className = `btn-icon-sm ${isFav ? 'active' : ''}`;
             detailFavBtn.onclick = () => {
                 toggleFavorite(album, artistName, { querySelector: () => detailFavBtn });
                 // Re-update button
                 const updatedFavs = getFavorites();
                 const nowFav = !!updatedFavs[album.id];
-                detailFavBtn.textContent = nowFav ? '❤️' : '🤍';
+                detailFavBtn.innerHTML = nowFav ? '<re-icon icon="heart" weight="filled" size="1em"></re-icon>' : '<re-icon icon="heart" weight="outline" size="1em"></re-icon>';
                 detailFavBtn.className = `btn-icon-sm ${nowFav ? 'active' : ''}`;
                 updateDetailRating(album.id);
             };
@@ -707,7 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cachedTracksKey = `deezer_tracks_${album.id}`;
 
             if (navigator.onLine) {
-                const data = await fetchJSONP(`https://api.deezer.com/album/${album.id}/tracks`);
+                const data = await DeezerAPI.getAlbumTracks(album.id);
                 if (data.data && data.data.length > 0) {
                     tracks = data.data;
                     // Cache tracks in localStorage for offline accessibility
@@ -724,6 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (tracks.length > 0) {
+                currentPlaylist = tracks;
                 let totalDuration = 0;
 
                 document.getElementById('detail-track-count').textContent = `${tracks.length} cancione${tracks.length > 1 ? 's' : ''}`;
@@ -775,7 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             tracklist.innerHTML = `
                 <div class="status-container" style="padding:1.5rem;">
-                    <p class="status-message" style="color:var(--color-warning);">⚠️ El listado de pistas requiere conexión de red.</p>
+                    <p class="status-message" style="color:var(--color-warning);"><re-icon icon="danger-triangle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon> El listado de pistas requiere conexión de red.</p>
                 </div>
             `;
             console.error(error);
@@ -830,6 +852,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentTrack = null;
     let currentPlayingAlbum = null;
+    let currentPlaylist = []; // pistas del álbum en reproducción (para anterior/siguiente)
+
+    // Iconos SVG del reproductor (sin emojis)
+    const PLAY_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+    const PAUSE_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
+    const VOL_HIGH = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+    const VOL_LOW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+    const VOL_MUTE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>';
 
     function playTrack(track, album) {
         if (!track.preview) {
@@ -859,9 +889,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Play
         mainAudio.play()
             .then(() => {
-                playPauseBtn.textContent = '⏸';
+                playPauseBtn.innerHTML = PAUSE_ICON;
             })
             .catch(err => {
+                // AbortError ocurre al cambiar de pista rápidamente (una nueva
+                // carga interrumpe el play anterior); no es un error real.
+                if (err && err.name === 'AbortError') return;
                 console.error('Error al reproducir:', err);
                 showToast('Error al iniciar la reproducción', 'danger');
             });
@@ -873,13 +906,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!currentTrack) return;
             if (mainAudio.paused) {
                 mainAudio.play();
-                playPauseBtn.textContent = '⏸';
+                playPauseBtn.innerHTML = PAUSE_ICON;
             } else {
                 mainAudio.pause();
-                playPauseBtn.textContent = '▶';
+                playPauseBtn.innerHTML = PLAY_ICON;
             }
         });
     }
+
+    // Anterior / Siguiente dentro del álbum en reproducción
+    function playRelative(offset) {
+        if (!currentTrack || currentPlaylist.length === 0) return;
+        const idx = currentPlaylist.findIndex(t => t.id === currentTrack.id);
+        if (idx === -1) return;
+        const target = idx + offset;
+        if (target < 0 || target >= currentPlaylist.length) return;
+        playTrack(currentPlaylist[target], currentPlayingAlbum);
+    }
+
+    const prevBtn = document.getElementById('player-prev-btn');
+    const nextBtn = document.getElementById('player-next-btn');
+    if (prevBtn) prevBtn.addEventListener('click', () => playRelative(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => playRelative(1));
 
     // Time update
     if (mainAudio) {
@@ -898,9 +946,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         mainAudio.addEventListener('ended', () => {
-            playPauseBtn.textContent = '▶';
+            playPauseBtn.innerHTML = PLAY_ICON;
             playerProgress.value = 0;
             playerTimeCurrent.textContent = '0:00';
+            // Avanzar automáticamente a la siguiente pista del álbum, si existe
+            playRelative(1);
         });
     }
 
@@ -916,9 +966,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (volumeSlider) {
         volumeSlider.addEventListener('input', () => {
             mainAudio.volume = volumeSlider.value / 100;
-            if (mainAudio.volume === 0) muteBtn.textContent = '🔇';
-            else if (mainAudio.volume < 0.5) muteBtn.textContent = '🔉';
-            else muteBtn.textContent = '🔊';
+            if (mainAudio.volume === 0) muteBtn.innerHTML = VOL_MUTE;
+            else if (mainAudio.volume < 0.5) muteBtn.innerHTML = VOL_LOW;
+            else muteBtn.innerHTML = VOL_HIGH;
         });
     }
 
@@ -927,11 +977,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mainAudio.muted) {
                 mainAudio.muted = false;
                 volumeSlider.value = mainAudio.volume * 100;
-                muteBtn.textContent = mainAudio.volume < 0.5 ? '🔉' : '🔊';
+                muteBtn.innerHTML = mainAudio.volume < 0.5 ? VOL_LOW : VOL_HIGH;
             } else {
                 mainAudio.muted = true;
                 volumeSlider.value = 0;
-                muteBtn.textContent = '🔇';
+                muteBtn.innerHTML = VOL_MUTE;
             }
         });
     }
@@ -1087,7 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="star-rating" data-album-id="${album.id}" style="flex-shrink:0;">
                     ${[1, 2, 3, 4, 5].map(num => `
-                        <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}">★</span>
+                        <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
                     `).join('')}
                 </div>
                 ${queue.some(q => q.albumId == album.id) ? '<span class="track-offline-badge">Pendiente</span>' : ''}
@@ -1157,9 +1207,9 @@ document.addEventListener('DOMContentLoaded', () => {
             syncQueueList.innerHTML = '';
             queue.forEach(item => {
                 const actionLabels = {
-                    'add_favorite': '❤️ Añadir a favoritos',
-                    'remove_favorite': '💔 Eliminar de favoritos',
-                    'rate_album': '⭐ Calificar álbum'
+                    'add_favorite': '<re-icon icon="heart" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon> Añadir a favoritos',
+                    'remove_favorite': '<re-icon icon="heart" weight="outline" size="1em" style="vertical-align:text-bottom;"></re-icon> Eliminar de favoritos',
+                    'rate_album': '<re-icon icon="star" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon> Calificar álbum'
                 };
                 const el = document.createElement('div');
                 el.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0.75rem; background:var(--bg-hover); border-radius:var(--radius-sm); font-size:0.85rem;';
@@ -1185,7 +1235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const el = document.createElement('div');
                     el.style.cssText = 'display:flex; justify-content:space-between; font-size:0.85rem; padding:0.25rem 0; color:var(--text-secondary);';
                     el.innerHTML = `
-                        <span>✅ ${entry.count} cambio${entry.count > 1 ? 's' : ''} sincronizado${entry.count > 1 ? 's' : ''}</span>
+                        <span><re-icon icon="check-circle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon> ${entry.count} cambio${entry.count > 1 ? 's' : ''} sincronizado${entry.count > 1 ? 's' : ''}</span>
                         <span style="color:var(--text-tertiary); font-size:0.75rem;">${new Date(entry.timestamp).toLocaleString('es')}</span>
                     `;
                     syncHistory.appendChild(el);
@@ -1239,24 +1289,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (networkText) networkText.textContent = 'Sincronizando...';
         if (networkStatus) networkStatus.className = 'network-badge offline';
 
-        // Enviar cola al servidor personal con fallback local
-        setTimeout(async () => {
-            try {
-                const response = await fetch('http://localhost:3000/api/sync', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ username: loggedUser, queue: queue })
-                });
-                if (response.ok) {
-                    console.log('Sincronización diferida completada con el servidor personal.');
-                }
-            } catch (err) {
-                console.warn('Servidor personal de sincronización no disponible. Sincronización diferida completada en modo cliente local.');
-            }
-
+        // La sincronización es 100% local (no hay backend propio, según pide el
+        // enunciado). Se simula una sincronización diferida con un pequeño retardo
+        // y se registra el resultado en el historial local.
+        setTimeout(() => {
             console.log(`Sincronizados ${queue.length} cambios:`, queue);
 
             // Save to history
