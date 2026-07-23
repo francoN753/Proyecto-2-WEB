@@ -63,6 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const SUN_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
     const MOON_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
 
+    // Iconos de corazón para favoritos (contorno = no guardado, relleno = guardado)
+    const HEART_OUTLINE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
+    const HEART_FILLED = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
+
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
         htmlElement.setAttribute('data-theme', savedTheme);
@@ -94,8 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             applyTheme();
         }
-
-        showToast(`Tema cambiado a modo ${newTheme === 'light' ? 'claro' : 'oscuro'}`, 'success', 2000);
     }
 
     function updateThemeUI() {
@@ -169,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
 
-        const icons = { success: '✅', warning: '⚠️', danger: '❌', info: '🔔' };
-        const icon = icons[type] || '🔔';
+        const icons = { success: '<re-icon icon="check-circle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>', warning: '<re-icon icon="danger-triangle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>', danger: '<re-icon icon="close-circle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>', info: '<re-icon icon="bell" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>' };
+        const icon = icons[type] || '<re-icon icon="bell" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon>';
 
         toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
         toastContainer.appendChild(toast);
@@ -460,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="album-art-container">
                 <img class="album-art" src="${album.cover_medium || album.cover || ''}" alt="Portada de ${album.title}" loading="lazy">
                 <button class="btn-fav ${isFav ? 'active' : ''}" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}" title="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
-                    ${isFav ? '❤️' : '🤍'}
+                    ${isFav ? '<re-icon icon="heart" weight="filled" size="1em"></re-icon>' : '<re-icon icon="heart" weight="outline" size="1em"></re-icon>'}
                 </button>
                 ${isFavoriteView ? '<span class="album-badge-local">LOCAL</span>' : ''}
             </div>
@@ -472,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${isFav ? `
                     <div class="star-rating" data-album-id="${album.id}">
                         ${[1, 2, 3, 4, 5].map(num => `
-                            <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}">★</span>
+                            <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
                         `).join('')}
                     </div>
                     <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">${rating > 0 ? rating.toFixed(1) : ''}</span>
@@ -520,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveFavorites(favorites);
 
             favBtn.classList.remove('active');
-            favBtn.innerHTML = '🤍';
+            if(favBtn) favBtn.innerHTML = '<re-icon icon="heart" weight="outline" size="1em"></re-icon>';
 
             showToast(`"${album.title}" eliminado de tus favoritos`, 'info');
 
@@ -550,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveFavorites(favorites);
 
             favBtn.classList.add('active');
-            favBtn.innerHTML = '❤️';
+            if(favBtn) favBtn.innerHTML = '<re-icon icon="heart" weight="filled" size="1em"></re-icon>';
 
             showToast(`"${album.title}" guardado en favoritos`, 'success');
 
@@ -658,14 +660,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const isFav = !!favorites[album.id];
         const detailFavBtn = document.getElementById('detail-fav-btn');
         if (detailFavBtn) {
-            detailFavBtn.textContent = isFav ? '❤️' : '🤍';
+            detailFavBtn.innerHTML = isFav ? '<re-icon icon="heart" weight="filled" size="1em"></re-icon>' : '<re-icon icon="heart" weight="outline" size="1em"></re-icon>';
             detailFavBtn.className = `btn-icon-sm ${isFav ? 'active' : ''}`;
             detailFavBtn.onclick = () => {
                 toggleFavorite(album, artistName, { querySelector: () => detailFavBtn });
                 // Re-update button
                 const updatedFavs = getFavorites();
                 const nowFav = !!updatedFavs[album.id];
-                detailFavBtn.textContent = nowFav ? '❤️' : '🤍';
+                detailFavBtn.innerHTML = nowFav ? '<re-icon icon="heart" weight="filled" size="1em"></re-icon>' : '<re-icon icon="heart" weight="outline" size="1em"></re-icon>';
                 detailFavBtn.className = `btn-icon-sm ${nowFav ? 'active' : ''}`;
                 updateDetailRating(album.id);
             };
@@ -795,7 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             tracklist.innerHTML = `
                 <div class="status-container" style="padding:1.5rem;">
-                    <p class="status-message" style="color:var(--color-warning);">⚠️ El listado de pistas requiere conexión de red.</p>
+                    <p class="status-message" style="color:var(--color-warning);"><re-icon icon="danger-triangle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon> El listado de pistas requiere conexión de red.</p>
                 </div>
             `;
             console.error(error);
@@ -852,6 +854,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPlayingAlbum = null;
     let currentPlaylist = []; // pistas del álbum en reproducción (para anterior/siguiente)
 
+    // Iconos SVG del reproductor (sin emojis)
+    const PLAY_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+    const PAUSE_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
+    const VOL_HIGH = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+    const VOL_LOW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+    const VOL_MUTE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>';
+
     function playTrack(track, album) {
         if (!track.preview) {
             showToast('Este track no tiene vista previa disponible', 'warning');
@@ -880,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Play
         mainAudio.play()
             .then(() => {
-                playPauseBtn.textContent = '⏸';
+                playPauseBtn.innerHTML = PAUSE_ICON;
             })
             .catch(err => {
                 // AbortError ocurre al cambiar de pista rápidamente (una nueva
@@ -897,10 +906,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!currentTrack) return;
             if (mainAudio.paused) {
                 mainAudio.play();
-                playPauseBtn.textContent = '⏸';
+                playPauseBtn.innerHTML = PAUSE_ICON;
             } else {
                 mainAudio.pause();
-                playPauseBtn.textContent = '▶';
+                playPauseBtn.innerHTML = PLAY_ICON;
             }
         });
     }
@@ -937,7 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         mainAudio.addEventListener('ended', () => {
-            playPauseBtn.textContent = '▶';
+            playPauseBtn.innerHTML = PLAY_ICON;
             playerProgress.value = 0;
             playerTimeCurrent.textContent = '0:00';
             // Avanzar automáticamente a la siguiente pista del álbum, si existe
@@ -957,9 +966,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (volumeSlider) {
         volumeSlider.addEventListener('input', () => {
             mainAudio.volume = volumeSlider.value / 100;
-            if (mainAudio.volume === 0) muteBtn.textContent = '🔇';
-            else if (mainAudio.volume < 0.5) muteBtn.textContent = '🔉';
-            else muteBtn.textContent = '🔊';
+            if (mainAudio.volume === 0) muteBtn.innerHTML = VOL_MUTE;
+            else if (mainAudio.volume < 0.5) muteBtn.innerHTML = VOL_LOW;
+            else muteBtn.innerHTML = VOL_HIGH;
         });
     }
 
@@ -968,11 +977,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mainAudio.muted) {
                 mainAudio.muted = false;
                 volumeSlider.value = mainAudio.volume * 100;
-                muteBtn.textContent = mainAudio.volume < 0.5 ? '🔉' : '🔊';
+                muteBtn.innerHTML = mainAudio.volume < 0.5 ? VOL_LOW : VOL_HIGH;
             } else {
                 mainAudio.muted = true;
                 volumeSlider.value = 0;
-                muteBtn.textContent = '🔇';
+                muteBtn.innerHTML = VOL_MUTE;
             }
         });
     }
@@ -1128,7 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="star-rating" data-album-id="${album.id}" style="flex-shrink:0;">
                     ${[1, 2, 3, 4, 5].map(num => `
-                        <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}">★</span>
+                        <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
                     `).join('')}
                 </div>
                 ${queue.some(q => q.albumId == album.id) ? '<span class="track-offline-badge">Pendiente</span>' : ''}
@@ -1198,9 +1207,9 @@ document.addEventListener('DOMContentLoaded', () => {
             syncQueueList.innerHTML = '';
             queue.forEach(item => {
                 const actionLabels = {
-                    'add_favorite': '❤️ Añadir a favoritos',
-                    'remove_favorite': '💔 Eliminar de favoritos',
-                    'rate_album': '⭐ Calificar álbum'
+                    'add_favorite': '<re-icon icon="heart" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon> Añadir a favoritos',
+                    'remove_favorite': '<re-icon icon="heart" weight="outline" size="1em" style="vertical-align:text-bottom;"></re-icon> Eliminar de favoritos',
+                    'rate_album': '<re-icon icon="star" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon> Calificar álbum'
                 };
                 const el = document.createElement('div');
                 el.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0.75rem; background:var(--bg-hover); border-radius:var(--radius-sm); font-size:0.85rem;';
@@ -1226,7 +1235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const el = document.createElement('div');
                     el.style.cssText = 'display:flex; justify-content:space-between; font-size:0.85rem; padding:0.25rem 0; color:var(--text-secondary);';
                     el.innerHTML = `
-                        <span>✅ ${entry.count} cambio${entry.count > 1 ? 's' : ''} sincronizado${entry.count > 1 ? 's' : ''}</span>
+                        <span><re-icon icon="check-circle" weight="filled" size="1em" style="vertical-align:text-bottom;"></re-icon> ${entry.count} cambio${entry.count > 1 ? 's' : ''} sincronizado${entry.count > 1 ? 's' : ''}</span>
                         <span style="color:var(--text-tertiary); font-size:0.75rem;">${new Date(entry.timestamp).toLocaleString('es')}</span>
                     `;
                     syncHistory.appendChild(el);
