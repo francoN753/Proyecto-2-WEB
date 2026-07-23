@@ -872,6 +872,70 @@ html, body {
   gap: 1rem;
 }
 
+/* Collection Album Item */
+.collection-album-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: background var(--t-fast), border-color var(--t-fast);
+  cursor: pointer;
+}
+.collection-album-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-tertiary);
+}
+
+.collection-album-cover {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-input);
+}
+
+.collection-album-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.collection-album-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collection-album-artist {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.15rem;
+}
+
+.collection-album-item .star-rating {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.collection-album-year {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  min-width: 40px;
+  text-align: right;
+}
+
 /* Change notification card */
 .change-notification {
   display: flex;

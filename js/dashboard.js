@@ -1145,29 +1145,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (collectionEmpty) collectionEmpty.classList.add('hidden');
 
-        // Render albums as track items (collection view)
+        // Render albums as collection items (collection view)
         favList.forEach((album, index) => {
             const isOffline = !navigator.onLine;
             const trackEl = document.createElement('div');
-            trackEl.className = `track-item`;
+            trackEl.className = `collection-album-item`;
 
             const rating = album.rating || 0;
 
             trackEl.innerHTML = `
-                <div style="display:flex; align-items:center; gap:0.75rem; flex:1; min-width:0;">
-                    <img src="${album.cover_medium || album.cover || ''}" alt="${album.title}" style="width:40px; height:40px; border-radius:var(--radius-sm); object-fit:cover; background:var(--bg-input);">
-                    <div style="min-width:0; flex:1;">
-                        <div style="font-weight:600; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${album.title}</div>
-                        <div style="font-size:0.75rem; color:var(--text-secondary);">${album.artistName} — ${album.release_date ? album.release_date.substring(0, 4) : 'N/A'}</div>
-                    </div>
+                <img class="collection-album-cover" src="${album.cover_medium || album.cover || ''}" alt="${album.title}">
+                <div class="collection-album-info">
+                    <div class="collection-album-title">${album.title}</div>
+                    <div class="collection-album-artist">${album.artistName} — ${album.release_date ? album.release_date.substring(0, 4) : 'N/A'}</div>
                 </div>
-                <div class="star-rating" data-album-id="${album.id}" style="flex-shrink:0;">
+                <div class="star-rating" data-album-id="${album.id}">
                     ${[1, 2, 3, 4, 5].map(num => `
                         <span class="star ${num <= rating ? 'filled' : ''} interactive" data-value="${num}"><re-icon icon="star" weight="filled" size="1em"></re-icon></span>
                     `).join('')}
                 </div>
                 ${queue.some(q => q.albumId == album.id) ? '<span class="track-offline-badge">Pendiente</span>' : ''}
-                <span class="track-duration" style="flex-shrink:0;">${album.release_date ? album.release_date.substring(0, 4) : ''}</span>
+                <span class="collection-album-year">${album.release_date ? album.release_date.substring(0, 4) : ''}</span>
             `;
 
             // Star rating in collection
