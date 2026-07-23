@@ -22,10 +22,10 @@ Este proyecto es una Single Page Application (SPA) construida con tecnologías w
 
 ## Uso de Inteligencia Artificial en el Desarrollo 🤖🚀
 
-Este proyecto fue desarrollado y estructurado gracias al uso de Inteligencia Artificial avanzada, logrando resultados profesionales en tiempo récord. Específicamente, integramos las siguientes tecnologías de IA en nuestro flujo de trabajo:
+Este proyecto fue desarrollado y estructurado gracias al uso de Inteligencia Artificial avanzada, integramos las siguientes tecnologías de IA en nuestro flujo de trabajo:
 
 - **Claude Code con Antigravity:** Utilizamos el entorno avanzado de Antigravity IDE, lo que permitió a la IA tener un contexto total del espacio de trabajo.
-- **Modelos de Lenguaje de Última Generación:** El desarrollo se llevó a cabo utilizando **Claude 3.5 Opus (4.8)** y **Gemini Pro 3.1**, combinando sus capacidades de razonamiento profundo.
+- **Modelos de Lenguaje de Última Generación:** El desarrollo se llevó a cabo utilizando **Claude Opus (4.8)** y **Gemini Pro 3.1**, combinando sus capacidades de razonamiento profundo.
 - **Plan Mode:** La arquitectura y refactorizaciones complejas (como el CSS Grid o el Service Worker) fueron cuidadosamente elaboradas utilizando el *Plan Mode* del agente, permitiendo una colaboración iterativa y sin errores entre el usuario y la IA.
 - **Íconos e Interfaz:** La interfaz fue enriquecida visualmente utilizando un repositorio externo de iconos vectoriales ultraligeros de GitHub (ReIcon), integrado directamente por la IA para embellecer los botones.
 - **Pruebas Automatizadas QA (Agentes MCP):** Las funcionalidades del proyecto (autenticación, ruteo SPA, conexión al API y el reproductor de audio) fueron rigurosamente validadas. Para ello, instanciamos un **agente especializado con extensión de Chrome mediante MCP (Model Context Protocol)**, el cual abrió un navegador real de forma autónoma e interactuó con el proyecto en vivo simulando a un usuario humano para reportar el estado de cada componente.
