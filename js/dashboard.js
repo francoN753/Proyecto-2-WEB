@@ -194,47 +194,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /* ====================================================
-       6. JSONP CLIENT (Bypass CORS for Deezer API)
+       6. FETCH CLIENT (Bypass CORS for Deezer API)
        ==================================================== */
-    function fetchJSONP(url) {
-        return new Promise((resolve, reject) => {
-            if (!navigator.onLine) {
-                reject(new Error('OFFLINE'));
-                return;
+    async function fetchJSONP(url) {
+        if (!navigator.onLine) {
+            throw new Error('OFFLINE');
+        }
+
+        try {
+            // Using a CORS proxy instead of JSONP for reliability and SW compatibility
+            const CORS_PROXY = 'https://corsproxy.io/?';
+            const finalUrl = CORS_PROXY + encodeURIComponent(url);
+            
+            const response = await fetch(finalUrl);
+            
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
             }
-
-            const callbackName = 'deezer_jsonp_' + Math.random().toString(36).substring(2, 15);
-            window[callbackName] = function (data) {
-                cleanup();
-                if (data && data.error) {
-                    reject(new Error(data.error.message || 'Error en API Deezer'));
-                } else {
-                    resolve(data);
-                }
-            };
-
-            const script = document.createElement('script');
-            script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + callbackName + '&output=jsonp';
-            script.id = callbackName;
-
-            script.onerror = function () {
-                cleanup();
-                reject(new Error('Error de red al consultar el servidor de Deezer'));
-            };
-
-            const timeoutId = setTimeout(() => {
-                cleanup();
-                reject(new Error('Tiempo de espera de la petición agotado (Timeout)'));
-            }, 10000);
-
-            function cleanup() {
-                clearTimeout(timeoutId);
-                if (script.parentNode) script.parentNode.removeChild(script);
-                delete window[callbackName];
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error.message || "Error devuelto por Deezer");
             }
-
-            document.body.appendChild(script);
-        });
+            
+            return data;
+        } catch (error) {
+            console.error("Error consultando la API:", error);
+            throw new Error('Error de red al consultar el servidor de Deezer');
+        }
     }
 
 
@@ -300,16 +288,93 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Clear search results and restore empty state when search input is empty
+        // Clear search results and restore trending view when search input is empty
         searchInput.addEventListener('input', () => {
             if (!searchInput.value.trim()) {
                 artistDetail.classList.add('hidden');
                 statusContainer.classList.add('hidden');
                 if (searchResultsHeader) searchResultsHeader.classList.add('hidden');
-                if (searchEmptyState) searchEmptyState.classList.remove('hidden');
+                // Show trending section again
+                const trendingSection = document.getElementById('trending-section');
+                if (trendingSection) trendingSection.classList.remove('hidden');
             }
         });
     }
+
+
+    /* ====================================================
+       7b. CARGA AUTOMÁTICA DE ARTISTAS EN TENDENCIA
+       ==================================================== */
+    const trendingSection = document.getElementById('trending-section');
+    const trendingGrid = document.getElementById('trending-grid');
+
+    async function loadTrendingArtists() {
+        if (!trendingGrid) return;
+
+        if (!navigator.onLine) {
+            // Offline: show empty state instead
+            if (trendingSection) trendingSection.classList.add('hidden');
+            if (searchEmptyState) searchEmptyState.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            // Deezer chart endpoint returns the most popular artists globally
+            const data = await fetchJSONP('https://api.deezer.com/chart/0/artists?limit=12');
+
+            if (data.data && data.data.length > 0) {
+                trendingGrid.innerHTML = '';
+
+                data.data.forEach(artist => {
+                    const card = document.createElement('div');
+                    card.className = 'album-card';
+                    card.style.cursor = 'pointer';
+
+                    card.innerHTML = `
+                        <div class="album-art-container">
+                            <img class="album-art" src="${artist.picture_medium || artist.picture || ''}" 
+                                 alt="${artist.name}" loading="lazy"
+                                 style="border-radius:50%; aspect-ratio:1; object-fit:cover;">
+                        </div>
+                        <div class="album-info-container" style="text-align:center;">
+                            <h3 class="album-title">${artist.name}</h3>
+                            <p class="album-artist-name">${(artist.nb_fan || 0).toLocaleString()} fans</p>
+                        </div>
+                    `;
+
+                    // Click on trending artist → search for them
+                    card.addEventListener('click', () => {
+                        currentArtist = artist;
+                        if (searchInput) searchInput.value = artist.name;
+                        // Hide trending, show artist detail
+                        if (trendingSection) trendingSection.classList.add('hidden');
+                        renderArtist(artist);
+                    });
+
+                    trendingGrid.appendChild(card);
+                });
+            } else {
+                // No data: show empty state
+                if (trendingSection) trendingSection.classList.add('hidden');
+                if (searchEmptyState) searchEmptyState.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error cargando artistas en tendencia:', error);
+            // On error: show fallback empty state
+            if (trendingSection) trendingSection.classList.add('hidden');
+            if (searchEmptyState) searchEmptyState.classList.remove('hidden');
+        }
+    }
+
+    // Hide trending when user searches
+    if (searchForm) {
+        searchForm.addEventListener('submit', () => {
+            if (trendingSection) trendingSection.classList.add('hidden');
+        });
+    }
+
+    // Auto-load trending artists on page load
+    loadTrendingArtists();
 
 
     /* ====================================================
