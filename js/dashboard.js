@@ -365,7 +365,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.data && data.data.length > 0) {
                 trendingGrid.innerHTML = '';
 
-                data.data.forEach(artist => {
+                // Fetch full artist details in parallel to get nb_fan (which /chart/0/artists doesn't return)
+                const artistsWithDetails = await Promise.all(
+                    data.data.map(async (artist) => {
+                        try {
+                            const fullInfo = await DeezerAPI.getArtist(artist.id);
+                            return { ...artist, ...fullInfo };
+                        } catch {
+                            return artist;
+                        }
+                    })
+                );
+
+                artistsWithDetails.forEach(artist => {
                     const card = createArtistCard(artist, (selected) => {
                         currentArtist = selected;
                         if (searchInput) searchInput.value = selected.name;
@@ -408,6 +420,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('artist-fans').textContent = `${(artist.nb_fan || 0).toLocaleString()} oyentes mensuales`;
         document.getElementById('artist-image').src = artist.picture_medium || artist.picture || '';
         document.getElementById('artist-image').alt = `Foto de ${artist.name}`;
+
+        // Fallback: Si el objeto de artista no contenía nb_fan, obtenerlo de la API
+        if (!artist.nb_fan) {
+            DeezerAPI.getArtist(artist.id).then(fullArtist => {
+                if (fullArtist && fullArtist.nb_fan) {
+                    artist.nb_fan = fullArtist.nb_fan;
+                    if (currentArtist && currentArtist.id === artist.id) {
+                        currentArtist.nb_fan = fullArtist.nb_fan;
+                    }
+                    const fansEl = document.getElementById('artist-fans');
+                    if (fansEl) fansEl.textContent = `${fullArtist.nb_fan.toLocaleString()} oyentes mensuales`;
+                }
+            }).catch(() => {});
+        }
 
         // Load albums
         albumsGrid.innerHTML = '';

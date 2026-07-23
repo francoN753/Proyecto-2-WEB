@@ -70,6 +70,8 @@ const DeezerAPI = (() => {
         request,
         // Buscar artistas por nombre
         searchArtists: (queryText) => request('/search/artist', { q: queryText }),
+        // Obtener detalle completo de un artista
+        getArtist: (artistId) => request(`/artist/${artistId}`),
         // Artistas más populares (para la sección de tendencias)
         getTrendingArtists: (limit = 12) => request('/chart/0/artists', { limit }),
         // Discografía de un artista
