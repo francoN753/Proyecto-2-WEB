@@ -720,6 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (tracks.length > 0) {
+                currentPlaylist = tracks;
                 let totalDuration = 0;
 
                 document.getElementById('detail-track-count').textContent = `${tracks.length} cancione${tracks.length > 1 ? 's' : ''}`;
@@ -826,6 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentTrack = null;
     let currentPlayingAlbum = null;
+    let currentPlaylist = []; // pistas del álbum en reproducción (para anterior/siguiente)
 
     function playTrack(track, album) {
         if (!track.preview) {
@@ -858,6 +860,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 playPauseBtn.textContent = '⏸';
             })
             .catch(err => {
+                // AbortError ocurre al cambiar de pista rápidamente (una nueva
+                // carga interrumpe el play anterior); no es un error real.
+                if (err && err.name === 'AbortError') return;
                 console.error('Error al reproducir:', err);
                 showToast('Error al iniciar la reproducción', 'danger');
             });
@@ -876,6 +881,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Anterior / Siguiente dentro del álbum en reproducción
+    function playRelative(offset) {
+        if (!currentTrack || currentPlaylist.length === 0) return;
+        const idx = currentPlaylist.findIndex(t => t.id === currentTrack.id);
+        if (idx === -1) return;
+        const target = idx + offset;
+        if (target < 0 || target >= currentPlaylist.length) return;
+        playTrack(currentPlaylist[target], currentPlayingAlbum);
+    }
+
+    const prevBtn = document.getElementById('player-prev-btn');
+    const nextBtn = document.getElementById('player-next-btn');
+    if (prevBtn) prevBtn.addEventListener('click', () => playRelative(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => playRelative(1));
 
     // Time update
     if (mainAudio) {
@@ -897,6 +917,8 @@ document.addEventListener('DOMContentLoaded', () => {
             playPauseBtn.textContent = '▶';
             playerProgress.value = 0;
             playerTimeCurrent.textContent = '0:00';
+            // Avanzar automáticamente a la siguiente pista del álbum, si existe
+            playRelative(1);
         });
     }
 
