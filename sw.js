@@ -1,16 +1,15 @@
-const CACHE_NAME = 'deezer-manager-v3';
+const CACHE_NAME = 'deezer-manager-v4';
 const ASSETS = [
     './',
     './index.html',
-    './app.html',
+    './dashboard.html',
     './css/reset.css',
     './css/variables.css',
     './css/layout.css',
     './css/components.css',
     './js/auth.js',
-    './js/app.js',
     './js/api.js',
-    './js/storage.js',
+    './js/dashboard.js',
     './manifest.json'
 ];
 
