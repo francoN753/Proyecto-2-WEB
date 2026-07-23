@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Deezer-Manager — Plataforma Avanzada de Gestión Musical.">
+    <title>Deezer-Manager | Login</title>
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/variables.css">
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/animations.css">
+    <link rel="manifest" href="./manifest.json">
+    <script src="https://unpkg.com/reicon/cdn/reicon.js"></script>
+</head>
+<body class="login-layout">
+
+    <div class="glass-card login-card">
+        <!-- Logo & Title -->
+        <div class="login-header">
+            <div class="login-icon">
+                <re-icon icon="music-notes" weight="outline" size="32" color="currentColor"></re-icon>
+            </div>
+            <h1>Deezer-Manager</h1>
+            <p class="subtitle">Gestión Musical Avanzada</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <div class="input-wrapper">
+                    <re-icon class="input-icon" icon="user" weight="outline" size="16"></re-icon>
+                    <input type="text" id="username" name="username" value="admin" required autocomplete="username" placeholder="Ingresa tu usuario">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="input-wrapper">
+                    <re-icon class="input-icon" icon="lock-keyhole" weight="outline" size="16"></re-icon>
+                    <input type="password" id="password" name="password" value="12345" required autocomplete="current-password" placeholder="Ingresa tu contraseña">
+                </div>
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn-primary">
+                <span id="btn-text">Iniciar Sesión</span>
+                <div id="login-spinner" class="spinner"></div>
+            </button>
+        </form>
+    </div>
+
+    <!-- Theme toggle -->
+    <button id="theme-toggle" class="theme-toggle-floating" aria-label="Cambiar tema">
+        <re-icon class="moon-icon" icon="moon" weight="outline" size="20"></re-icon>
+    </button>
+
+    <script src="./js/auth.js"></script>
+</body>
+</html>
