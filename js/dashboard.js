@@ -58,6 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownThemeToggle = document.getElementById('dropdown-theme-toggle');
     const htmlElement = document.documentElement;
 
+    // Iconos SVG del botón de tema (estilo línea, sin emojis).
+    // Se declaran antes de la primera llamada a updateThemeUI().
+    const SUN_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+    const MOON_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
         htmlElement.setAttribute('data-theme', savedTheme);
@@ -67,23 +72,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateThemeUI();
 
-    function toggleTheme() {
+    function toggleTheme(event) {
         const current = htmlElement.getAttribute('data-theme');
         const newTheme = current === 'light' ? 'dark' : 'light';
-        htmlElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeUI();
+
+        // Origen del círculo de revelado = punto donde se hizo clic
+        if (event) {
+            htmlElement.style.setProperty('--theme-x', event.clientX + 'px');
+            htmlElement.style.setProperty('--theme-y', event.clientY + 'px');
+        }
+
+        const applyTheme = () => {
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeUI();
+        };
+
+        // Revelado circular si el navegador soporta View Transitions; si no, cambio directo
+        if (document.startViewTransition) {
+            document.startViewTransition(applyTheme);
+        } else {
+            applyTheme();
+        }
+
         showToast(`Tema cambiado a modo ${newTheme === 'light' ? 'claro' : 'oscuro'}`, 'success', 2000);
     }
 
     function updateThemeUI() {
         const theme = htmlElement.getAttribute('data-theme');
-        if (themeToggleBtn) themeToggleBtn.textContent = theme === 'light' ? '🌙' : '☀️';
-        if (dropdownThemeToggle) dropdownThemeToggle.textContent = theme === 'light' ? '🌙 Modo Oscuro' : '☀️ Modo Claro';
+        // En modo claro se ofrece pasar a oscuro (luna); en oscuro, a claro (sol)
+        if (themeToggleBtn) themeToggleBtn.innerHTML = theme === 'light' ? MOON_ICON : SUN_ICON;
+        if (dropdownThemeToggle) dropdownThemeToggle.textContent = theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
     }
 
-    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
-    if (dropdownThemeToggle) dropdownThemeToggle.addEventListener('click', toggleTheme);
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', (e) => toggleTheme(e));
+    if (dropdownThemeToggle) dropdownThemeToggle.addEventListener('click', (e) => toggleTheme(e));
 
 
     /* ====================================================

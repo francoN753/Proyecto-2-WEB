@@ -20,12 +20,26 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg>`;
     };
 
-    themeToggle.addEventListener('click', () => {
+    themeToggle.addEventListener('click', (event) => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
+
+        // Origen del círculo de revelado = punto donde se hizo clic
+        document.documentElement.style.setProperty('--theme-x', event.clientX + 'px');
+        document.documentElement.style.setProperty('--theme-y', event.clientY + 'px');
+
+        const apply = () => {
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        };
+
+        // Revelado circular si el navegador soporta View Transitions; si no, cambio directo
+        if (document.startViewTransition) {
+            document.startViewTransition(apply);
+        } else {
+            apply();
+        }
     });
 
     // Check if already authenticated
