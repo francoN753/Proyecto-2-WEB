@@ -216,6 +216,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchResultsCount = document.getElementById('search-results-count');
 
     let currentArtist = null;
+    const searchResultsGrid = document.getElementById('search-results-grid');
+
+    // Tarjeta de artista reutilizable (para búsqueda y tendencias)
+    function createArtistCard(artist, onSelect) {
+        const card = document.createElement('div');
+        card.className = 'album-card';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+            <div class="album-art-container">
+                <img class="album-art" src="${artist.picture_medium || artist.picture || ''}"
+                     alt="${artist.name}" loading="lazy"
+                     style="border-radius:50%; aspect-ratio:1; object-fit:cover;">
+            </div>
+            <div class="album-info-container" style="text-align:center;">
+                <h3 class="album-title">${artist.name}</h3>
+                <p class="album-artist-name">${(artist.nb_fan || 0).toLocaleString()} fans</p>
+            </div>
+        `;
+        card.addEventListener('click', () => onSelect(artist));
+        return card;
+    }
+
+    // Renderiza la grilla con TODOS los artistas encontrados en la búsqueda.
+    // Al hacer clic en uno se abre su detalle (discografía).
+    function renderArtistResults(artists) {
+        if (trendingSection) trendingSection.classList.add('hidden');
+        artistDetail.classList.add('hidden');
+        if (!searchResultsGrid) return;
+        searchResultsGrid.innerHTML = '';
+        searchResultsGrid.classList.remove('hidden');
+        artists.forEach(artist => {
+            const card = createArtistCard(artist, (selected) => {
+                currentArtist = selected;
+                searchResultsGrid.classList.add('hidden');
+                if (searchResultsHeader) searchResultsHeader.classList.add('hidden');
+                renderArtist(selected);
+            });
+            searchResultsGrid.appendChild(card);
+        });
+    }
 
     if (searchForm) {
         searchForm.addEventListener('submit', async (e) => {
@@ -247,13 +287,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     statusContainer.classList.add('hidden');
                     if (searchResultsHeader) {
                         searchResultsHeader.classList.remove('hidden');
-                        searchResultsCount.textContent = `${data.data.length} encontrado${data.data.length > 1 ? 's' : ''}`;
+                        searchResultsCount.textContent = `${data.data.length} artista${data.data.length > 1 ? 's' : ''} encontrado${data.data.length > 1 ? 's' : ''} para "${query}"`;
                     }
-                    const artist = data.data[0];
-                    currentArtist = artist;
-                    renderArtist(artist);
+                    renderArtistResults(data.data);
                 } else {
-                    statusMessage.textContent = `No se encontraron resultados para "${query}". Intenta buscar otro artista (ej. Daft Punk, Tame Impala).`;
+                    if (searchResultsGrid) searchResultsGrid.classList.add('hidden');
+                    if (searchResultsHeader) searchResultsHeader.classList.add('hidden');
+                    statusMessage.textContent = `No se encontraron resultados para "${query}". Intenta con otro artista (ej. Daft Punk, Tame Impala).`;
                 }
             } catch (error) {
                 searchSpinner.classList.remove('active');
@@ -268,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 artistDetail.classList.add('hidden');
                 statusContainer.classList.add('hidden');
                 if (searchResultsHeader) searchResultsHeader.classList.add('hidden');
+                if (searchResultsGrid) searchResultsGrid.classList.add('hidden');
                 // Show trending section again
                 const trendingSection = document.getElementById('trending-section');
                 if (trendingSection) trendingSection.classList.remove('hidden');
@@ -300,31 +341,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 trendingGrid.innerHTML = '';
 
                 data.data.forEach(artist => {
-                    const card = document.createElement('div');
-                    card.className = 'album-card';
-                    card.style.cursor = 'pointer';
-
-                    card.innerHTML = `
-                        <div class="album-art-container">
-                            <img class="album-art" src="${artist.picture_medium || artist.picture || ''}" 
-                                 alt="${artist.name}" loading="lazy"
-                                 style="border-radius:50%; aspect-ratio:1; object-fit:cover;">
-                        </div>
-                        <div class="album-info-container" style="text-align:center;">
-                            <h3 class="album-title">${artist.name}</h3>
-                            <p class="album-artist-name">${(artist.nb_fan || 0).toLocaleString()} fans</p>
-                        </div>
-                    `;
-
-                    // Click on trending artist → search for them
-                    card.addEventListener('click', () => {
-                        currentArtist = artist;
-                        if (searchInput) searchInput.value = artist.name;
-                        // Hide trending, show artist detail
+                    const card = createArtistCard(artist, (selected) => {
+                        currentArtist = selected;
+                        if (searchInput) searchInput.value = selected.name;
+                        // Ocultar tendencias y mostrar el detalle del artista
                         if (trendingSection) trendingSection.classList.add('hidden');
-                        renderArtist(artist);
+                        renderArtist(selected);
                     });
-
                     trendingGrid.appendChild(card);
                 });
             } else {
